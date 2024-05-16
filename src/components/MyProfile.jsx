@@ -1,13 +1,14 @@
-import NavBar from "./NavBar";
-import "./styles/MyProfile.css";
+import NavBar from './NavBar';
+import './styles/MyProfile.css';
 
-function MyProfile({
-  userData = { username: "Username here", email: "Email here" },
-}) {
+function MyProfile(
+  { userData = { username: 'Username here', email: 'Email here' } },
+  setIsLoggedIn
+) {
   const { username, email } = userData;
   return (
     <>
-      <NavBar />
+      <NavBar setIsLoggedIn={setIsLoggedIn} />
       <div className="my-profile">
         <div className="my-profile__container">
           <div className="my-profile__header">
