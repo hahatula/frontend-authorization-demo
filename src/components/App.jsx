@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import AppContext from '../contexts/AppContext';
 import Ducks from './Ducks';
 import Login from './Login';
 import MyProfile from './MyProfile';
@@ -18,22 +19,21 @@ function App() {
 
   useEffect(() => {
     const jwt = getToken();
-      
+
     if (!jwt) {
       return;
     }
-  
-    api
-    .getUserInfo(jwt)
-    .then(({ username, email }) => {
-      // If the response is successful, log the user in, save their 
-      // data to state, and navigate them to /ducks.
-      setIsLoggedIn(true);
-      setUserData({ username, email });
-      navigate("/ducks");
-    })
-    .catch(console.error);
 
+    api
+      .getUserInfo(jwt)
+      .then(({ username, email }) => {
+        // If the response is successful, log the user in, save their
+        // data to state, and navigate them to /ducks.
+        setIsLoggedIn(true);
+        setUserData({ username, email });
+        navigate('/ducks');
+      })
+      .catch(console.error);
   }, []);
 
   const handleRegistration = ({
@@ -77,50 +77,52 @@ function App() {
   };
 
   return (
-    <Routes>
-      <Route
-        path="/ducks"
-        element={
-          <ProtectedRoute isLoggedIn={isLoggedIn}>
-            <Ducks setIsLoggedIn={setIsLoggedIn} />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/my-profile"
-        element={
-          <ProtectedRoute isLoggedIn={isLoggedIn}>
-            <MyProfile userData={userData} setIsLoggedIn={setIsLoggedIn}/>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/login"
-        element={
-          <div className="loginContainer">
-            <Login handleLogin={handleLogin} />
-          </div>
-        }
-      />
-      <Route
-        path="/register"
-        element={
-          <div className="registerContainer">
-            <Register handleRegistration={handleRegistration} />
-          </div>
-        }
-      />
-      <Route
-        path="*"
-        element={
-          isLoggedIn ? (
-            <Navigate to="/ducks" replace />
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        }
-      />
-    </Routes>
+    <AppContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
+      <Routes>
+        <Route
+          path="/ducks"
+          element={
+            <ProtectedRoute >
+              <Ducks setIsLoggedIn={setIsLoggedIn} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-profile"
+          element={
+            <ProtectedRoute >
+              <MyProfile userData={userData} setIsLoggedIn={setIsLoggedIn} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <div className="loginContainer">
+              <Login handleLogin={handleLogin} />
+            </div>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <div className="registerContainer">
+              <Register handleRegistration={handleRegistration} />
+            </div>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            isLoggedIn ? (
+              <Navigate to="/ducks" replace />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+      </Routes>
+    </AppContext.Provider>
   );
 }
 

@@ -1,10 +1,13 @@
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import AppContext from '../contexts/AppContext';
 import { removeToken } from '../utils/token';
 import Logo from './Logo';
 import './styles/NavBar.css';
 
-function NavBar({ setIsLoggedIn }) {
+function NavBar() {
   const navigate = useNavigate();
+  const { setIsLoggedIn } = useContext(AppContext);
 
   function signOut() {
     removeToken();
