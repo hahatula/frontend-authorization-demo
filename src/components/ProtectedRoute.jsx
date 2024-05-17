@@ -2,13 +2,16 @@ import { useContext } from 'react';
 import AppContext from '../contexts/AppContext';
 import { Navigate, useLocation } from 'react-router-dom';
 
-function ProtectedRoute({ children, anonymous = false }) {
+function ProtectedRoute({ 
+    children, 
+    anonymous = false // prop anonymus is used to indicate routes that can be visited anonymusly (without authrization). We set it fasle for protected routes 
+}) {
   const location = useLocation();
-  const from = location.state?.from || '/';
+  const from = location.state?.from || '/'; 
 
   const { isLoggedIn } = useContext(AppContext);
 
-  if (anonymous && isLoggedIn) {
+  if (anonymous && isLoggedIn) { // ??? why anonymous AND isLoggedIn? we are creating protected routes in this file...
     return <Navigate to={from} />;
   }
 

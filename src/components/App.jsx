@@ -1,4 +1,10 @@
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import {
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation,
+} from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import AppContext from '../contexts/AppContext';
 import Ducks from './Ducks';
@@ -14,8 +20,9 @@ import { setToken, getToken } from '../utils/token';
 function App() {
   const [userData, setUserData] = useState({ username: '', email: '' });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
   const navigate = useNavigate();
+
+  const location = useLocation();
 
   useEffect(() => {
     const jwt = getToken();
@@ -31,7 +38,6 @@ function App() {
         // data to state, and navigate them to /ducks.
         setIsLoggedIn(true);
         setUserData({ username, email });
-        navigate('/ducks');
       })
       .catch(console.error);
   }, []);
@@ -70,7 +76,9 @@ function App() {
           setToken(data.jwt); // save the token to local storage
           setUserData(data.user); // save user's data to state
           setIsLoggedIn(true); // log the user in
-          navigate('/ducks'); // send them to /ducks
+          // send them to the stored in state location or to '/ducks' if nothing saved
+          const rediretPath = location.state?.from?.pathname || '/ducks';
+          navigate(rediretPath);
         }
       })
       .catch(console.error);
@@ -82,33 +90,37 @@ function App() {
         <Route
           path="/ducks"
           element={
-            <ProtectedRoute >
-              <Ducks setIsLoggedIn={setIsLoggedIn} />
+            <ProtectedRoute>
+              <Ducks />
             </ProtectedRoute>
           }
         />
         <Route
           path="/my-profile"
           element={
-            <ProtectedRoute >
-              <MyProfile userData={userData} setIsLoggedIn={setIsLoggedIn} />
+            <ProtectedRoute>
+              <MyProfile userData={userData} />
             </ProtectedRoute>
           }
         />
         <Route
           path="/login"
           element={
-            <div className="loginContainer">
-              <Login handleLogin={handleLogin} />
-            </div>
+            <ProtectedRoute anonymous>
+              <div className="loginContainer">
+                <Login handleLogin={handleLogin} />
+              </div>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/register"
           element={
-            <div className="registerContainer">
-              <Register handleRegistration={handleRegistration} />
-            </div>
+            <ProtectedRoute anonymous>
+              <div className="registerContainer">
+                <Register handleRegistration={handleRegistration} />
+              </div>
+            </ProtectedRoute>
           }
         />
         <Route
